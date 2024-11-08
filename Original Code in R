@@ -1,0 +1,32 @@
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(tseries)
+library(lubridate)
+##Read data, load it, and choose the columns we need for the analysis
+chemical_cosmetic <- read.csv("C:/Users/98910/Desktop/cosmetic_chemicals.csv")
+str(chemical_cosmetic)
+summary(chemical_cosmetic)
+chemical_cosmetic <- chemical_cosmetic[, c("PrimaryCategory", "ChemicalCount", "CompanyName")]
+
+##Data cleaning
+chemical_cosmetic <- na.omit(chemical_cosmetic)
+sum(is.na(chemical_cosmetic))
+
+summary(chemical_cosmetic$ChemicalCount)
+str(chemical_cosmetic$ChemicalCount)
+## Converting categorical data to factors so that R can distinguish between them during the analysis
+chemical_cosmetic$PrimaryCategory <- as.factor(chemical_cosmetic$PrimaryCategory)
+
+##Linear Regression
+reg <- lm(chemical_cosmetic$ChemicalCount ~ chemical_cosmetic$PrimaryCategory, data= chemical_cosmetic)
+summary(reg)
+
+predicted_count <- predict(reg)
+
+##Visualizing the prediction
+ggplot(chemical_cosmetic, aes(x=PrimaryCategory, y=predicted_count)) + 
+  geom_bar(stat= "identity", fill="blue", color= "yellow") +
+  coord_flip() +
+  ggtitle("Predicted Chemical Count By Primary Category")
+theme_minimal()
